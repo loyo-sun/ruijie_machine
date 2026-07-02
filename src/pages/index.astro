@@ -1,0 +1,336 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import StyleSelector from "../components/StyleSelector.astro";
+
+const pageTitle = "Turnkey Smart Precast Beam Factory for Bridge Girder Production | Ruijie";
+const pageDescription =
+  "Ruijie provides smart precast beam factory and smart girder yard solutions for bridge girder production, helping EPC contractors improve production rhythm, labor efficiency, yard utilization and quality control.";
+
+const equipmentModules = [
+  "Mobile mold trolley",
+  "Smart concrete placing",
+  "Intelligent vibration",
+  "Solar + air-source heat pump curing",
+  "Hydraulic demolding",
+  "Smart control platform"
+];
+
+const newsItems = [
+  {
+    title: "Traditional Fixed-Bed Girder Yard vs Smart Girder Yard",
+    text: "A comparison guide for EPC teams evaluating schedule, labor, land use and quality control trade-offs."
+  },
+  {
+    title: "What Project Data Is Needed Before Designing a Precast Beam Factory?",
+    text: "A practical checklist covering girder type, quantity, production period, yard area and delivery assumptions."
+  },
+  {
+    title: "Why In-Mold Curing Matters in Precast Beam Production",
+    text: "A technical resource on curing consistency, energy options and quality documentation for infrastructure projects."
+  }
+];
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <Header />
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Turnkey smart girder yard solution</p>
+          <h1>Turnkey Smart Precast Beam Factory for Bridge Girder Production</h1>
+          <p class="hero-lede">
+            Ruijie helps EPC contractors, precast yard owners and infrastructure project teams plan, manufacture and deliver smarter girder yards with integrated equipment, workflow design and project-based delivery support.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#rfq">Send Project Parameters</a>
+            <a class="button secondary" href="#news">View News & Resources</a>
+          </div>
+          <dl class="proof-strip">
+            <div>
+              <dt>Turnkey scope</dt>
+              <dd>Layout, equipment, commissioning and training</dd>
+            </div>
+            <div>
+              <dt>Core scenario</dt>
+              <dd>Bridge girder production for highways, railways and viaducts</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="hero-visual" aria-label="Smart girder yard production flow visual">
+          <img src="/beam-factory-diagram.svg" alt="Smart precast beam factory production flow diagram" />
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="solution">
+      <div class="container two-column">
+        <SectionHeading
+          eyebrow="Solution"
+          title="From a traditional casting yard to a controlled production system"
+          text="The homepage should make one thing clear within five seconds: Ruijie is not only selling individual machines. It provides an integrated smart girder yard path for project teams facing schedule, labor, yard space, quality and curing challenges."
+        />
+        <div class="value-grid">
+          <article>
+            <span>01</span>
+            <h3>Production rhythm</h3>
+            <p>Plan production flow around girder type, estimated quantity, target period and yard constraints.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Labor efficiency</h3>
+            <p>Reduce dependence on manual placing, vibration, mold handling and repeated coordination work.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Yard utilization</h3>
+            <p>Use mobile mold trolley logic and modular equipment to support a more compact and organized yard.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>Quality records</h3>
+            <p>Support more consistent processes for curing, vibration, demolding and production management.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="container split-section" id="equipment">
+      <div>
+        <p class="eyebrow">Equipment modules</p>
+        <h2>Modules that can support a full solution or a focused yard upgrade</h2>
+        <p>
+          Equipment content stays separate from the Solution page because technical managers often need to evaluate a specific bottleneck before discussing a turnkey factory.
+        </p>
+      </div>
+      <ul class="module-list">
+        {equipmentModules.map((item) => <li>{item}</li>)}
+      </ul>
+    </section>
+
+    <section class="band muted" id="case-studies">
+      <div class="container case-grid">
+        <SectionHeading
+          eyebrow="Case studies"
+          title="Evidence should be presented with clear data boundaries"
+          text="Case content should separate project cases from scheme references. Turnover cycle, labor reduction, land saving and energy comparison figures must always state their project assumptions."
+        />
+        <article class="case-card">
+          <span>Reference principle</span>
+          <h3>Do not turn project-specific data into universal promises</h3>
+          <p>
+            For example, a 26-hour turnover cycle is a process cycle reference from a project case. It is not a daily output claim and should not be described as “one day production”.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="container" id="news">
+      <div class="news-head">
+        <SectionHeading
+          eyebrow="News & Resources"
+          title="A content entrance for SEO, GEO and sales education"
+          text="Use resources instead of a casual blog tone. The first content cluster should answer project planning, comparison and equipment evaluation questions."
+        />
+        <a class="button secondary" href="/resources/">Open Resource Center</a>
+      </div>
+      <div class="news-grid">
+        {newsItems.map((item) => (
+          <article class="news-card">
+            <span>Planned resource</span>
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
+            <a href="/resources/">Read later</a>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="container">
+        <SectionHeading
+          eyebrow="Visual direction"
+          title="Choose a style before expanding the full website"
+          text="The current prototype uses Clean Industrial. These are the candidate directions I recommend reviewing before we scale the design to Solution, Equipment, Case Studies and Contact pages."
+        />
+        <StyleSelector />
+      </div>
+    </section>
+
+    <section class="container geo-section">
+      <SectionHeading
+        eyebrow="GEO-ready structure"
+        title="Short answers for search engines and AI answer engines"
+        text="These Q&A blocks help the site explain Ruijie's role precisely and reduce the risk of AI systems misclassifying the company as a civil contractor."
+      />
+      <div class="qa-grid">
+        <article>
+          <h3>What does Ruijie provide?</h3>
+          <p>Ruijie provides smart precast beam factory and smart girder yard solutions, including equipment modules, manufacturing, commissioning support and project-based technical review.</p>
+        </article>
+        <article>
+          <h3>Is Ruijie an EPC contractor?</h3>
+          <p>No. Ruijie is positioned as a machinery and solution provider for bridge girder production yards, not as a civil works contractor.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="rfq-section" id="rfq">
+      <div class="container rfq-grid">
+        <div>
+          <p class="eyebrow">Contact / RFQ</p>
+          <h2>Tell us what you need</h2>
+          <p>
+            Keep the first contact simple. Leave your name, business email and a short note about your project or requirement. If you already know the project parameters, you can add them in the optional details section.
+          </p>
+          <div class="rfq-note">
+            <strong>Minimum required:</strong>
+            <span>Name, email and project notes. Other project data is optional and can be added later during technical discussion.</span>
+          </div>
+        </div>
+        <form name="project-rfq" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thank-you" class="rfq-form">
+          <input type="hidden" name="form-name" value="project-rfq" />
+          <p class="hidden">
+            <label>Do not fill this out if you are human: <input name="bot-field" /></label>
+          </p>
+
+          <div class="form-row">
+            <label>
+              Name *
+              <input name="contact_name" required placeholder="Your name" />
+            </label>
+            <label>
+              E-mail *
+              <input type="email" name="email" required placeholder="name@company.com" />
+            </label>
+          </div>
+
+          <label>
+            Project Notes *
+            <textarea name="message" rows="5" required placeholder="Briefly describe your project, required equipment, production challenge, or the support you need from Ruijie."></textarea>
+          </label>
+
+          <details class="optional-details">
+            <summary>
+              <span>Optional project details</span>
+              <small>Add country, project type, girder quantity or schedule if available</small>
+            </summary>
+            <div class="optional-fields">
+              <div class="form-row">
+                <label>
+                  Company Name
+                  <input name="company_name" placeholder="Company or organization" />
+                </label>
+                <label>
+                  WhatsApp / Phone
+                  <input name="whatsapp" placeholder="+62..." />
+                </label>
+              </div>
+
+              <div class="form-row">
+                <label>
+                  Country / Region
+                  <input name="country_region" placeholder="Indonesia, Saudi Arabia, Philippines..." />
+                </label>
+                <label>
+                  Project Location
+                  <input name="project_location" placeholder="City or project location" />
+                </label>
+              </div>
+
+              <div class="form-row">
+                <label>
+                  Project Type
+                  <select name="project_type">
+                    <option value="">Select one</option>
+                    <option>Highway bridge</option>
+                    <option>Railway bridge</option>
+                    <option>Urban viaduct</option>
+                    <option>Port / industrial infrastructure</option>
+                    <option>Existing precast yard upgrade</option>
+                    <option>Other</option>
+                  </select>
+                </label>
+                <label>
+                  Customer Type
+                  <select name="customer_type">
+                    <option value="">Select one</option>
+                    <option>EPC contractor</option>
+                    <option>Precast yard owner</option>
+                    <option>Project owner</option>
+                    <option>Consultant / PMC</option>
+                    <option>Distributor / partner</option>
+                    <option>Other</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="form-row">
+                <label>
+                  Girder Type
+                  <input name="girder_type" placeholder="T-beam, box girder, I-girder..." />
+                </label>
+                <label>
+                  Estimated Quantity
+                  <input name="estimated_quantity" placeholder="Number or range of girders" />
+                </label>
+              </div>
+
+              <div class="form-row">
+                <label>
+                  Target Production Period
+                  <input name="target_period" placeholder="12 months / 16 months..." />
+                </label>
+                <label>
+                  Available Yard Area
+                  <input name="available_yard_area" placeholder="m2 / mu / hectare" />
+                </label>
+              </div>
+
+              <div class="form-row">
+                <label>
+                  Existing Production Method
+                  <select name="existing_method">
+                    <option value="">Select one</option>
+                    <option>Traditional fixed-bed yard</option>
+                    <option>Outsourced girders</option>
+                    <option>Existing precast yard</option>
+                    <option>New yard planning</option>
+                    <option>Not sure</option>
+                  </select>
+                </label>
+                <label>
+                  Project Stage
+                  <select name="project_stage">
+                    <option value="">Select one</option>
+                    <option>Concept</option>
+                    <option>Tender</option>
+                    <option>Awarded</option>
+                    <option>Construction preparation</option>
+                    <option>Already started</option>
+                  </select>
+                </label>
+              </div>
+
+              <label>
+                Main Concern
+                <input name="main_concern" placeholder="Schedule, labor, yard space, quality, cost, service..." />
+              </label>
+            </div>
+          </details>
+
+          <label class="check-row">
+            <input type="checkbox" name="consent" required />
+            <span>I agree to be contacted by Ruijie about this project.</span>
+          </label>
+
+          <button class="button primary" type="submit">Submit Project</button>
+        </form>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

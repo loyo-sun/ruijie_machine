@@ -1,0 +1,24 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<BaseLayout
+  title="Thank You | Ruijie Machinery"
+  description="Thank you for sending your smart precast beam factory project parameters to Ruijie Machinery."
+>
+  <Header />
+  <main class="simple-page">
+    <section class="container">
+      <p class="eyebrow">Project inquiry received</p>
+      <h1>Thank you. Your project information has been received.</h1>
+      <p>
+        Ruijie will review the parameters and contact you for the next technical discussion.
+        If drawings, yard layout or project schedules are available, please send them in the follow-up email.
+      </p>
+      <a class="button primary" href="/">Back to Home</a>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

@@ -1,0 +1,38 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+
+const resources = [
+  "How Smart Girder Yards Help Reduce Land Use in Bridge Girder Production",
+  "Traditional Fixed-Bed Girder Yard vs Smart Girder Yard",
+  "What Project Data Is Needed Before Designing a Precast Beam Factory?"
+];
+---
+
+<BaseLayout
+  title="News and Resources | Ruijie Machinery"
+  description="News, technical resources and project guides for smart precast beam factory and smart girder yard planning."
+  canonical="/resources/"
+>
+  <Header />
+  <main class="simple-page">
+    <section class="container">
+      <p class="eyebrow">News & Resources</p>
+      <h1>Smart girder yard insights for project planning</h1>
+      <p>
+        This page is prepared as the Markdown-friendly content entrance. Future articles can be maintained as individual resource pages and linked back to Solution, Equipment and RFQ.
+      </p>
+      <div class="resource-list">
+        {resources.map((item) => (
+          <article>
+            <span>Planned article</span>
+            <h2>{item}</h2>
+            <p>Draft content placeholder for SEO validation and sales enablement.</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

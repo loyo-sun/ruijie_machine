@@ -1,0 +1,40 @@
+---
+const styles = [
+  {
+    name: "Clean Industrial",
+    tag: "Recommended",
+    description:
+      "White background, steel gray, engineering green and safety orange. Best for the first overseas B2B site because it feels practical, credible and easy to scan."
+  },
+  {
+    name: "Technical Blueprint",
+    tag: "More technical",
+    description:
+      "Blueprint lines, diagrams, specification blocks and tighter layouts. Best when the buyer audience is mainly engineers and technical managers."
+  },
+  {
+    name: "Infrastructure Editorial",
+    tag: "More story-led",
+    description:
+      "Large case imagery, project timelines and magazine-like sections. Best after Ruijie has more approved overseas project photos and client evidence."
+  },
+  {
+    name: "Control Room Dark",
+    tag: "More digital",
+    description:
+      "Dark monitoring interfaces, dashboards and data panels. Best if the brand wants to emphasize smart control, IoT and factory digitization."
+  }
+];
+---
+
+<div class="style-grid">
+  {styles.map((style) => (
+    <article class:list={["style-card", style.tag === "Recommended" && "is-selected"]}>
+      <div class="style-card-top">
+        <h3>{style.name}</h3>
+        <span>{style.tag}</span>
+      </div>
+      <p>{style.description}</p>
+    </article>
+  ))}
+</div>

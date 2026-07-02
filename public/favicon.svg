@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Ruijie">
+  <rect width="64" height="64" rx="10" fill="#17313d"/>
+  <path d="M14 40h36v6H14z" fill="#f59f32"/>
+  <path d="M18 19h28v8H18zM22 29h20v7H22z" fill="#ffffff"/>
+  <path d="M12 16h40v4H12z" fill="#36a39a"/>
+</svg>

@@ -1,0 +1,25 @@
+---
+const navItems = [
+  { label: "Solution", href: "#solution" },
+  { label: "Equipment", href: "#equipment" },
+  { label: "Case Studies", href: "#case-studies" },
+  { label: "News", href: "#news" },
+  { label: "Contact", href: "#rfq" }
+];
+---
+
+<header class="site-header">
+  <a class="brand" href="/" aria-label="Ruijie Machinery home">
+    <span class="brand-mark">RJ</span>
+    <span>
+      <strong>Ruijie Machinery</strong>
+      <small>Smart Girder Yard Solutions</small>
+    </span>
+  </a>
+  <nav class="main-nav" aria-label="Primary navigation">
+    {navItems.map((item) => (
+      <a href={item.href}>{item.label}</a>
+    ))}
+  </nav>
+  <a class="header-cta" href="#rfq">Request Solution</a>
+</header>

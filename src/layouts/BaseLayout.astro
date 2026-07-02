@@ -1,0 +1,68 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+}
+
+const {
+  title,
+  description,
+  canonical = Astro.url.pathname
+} = Astro.props;
+
+const gtmId = import.meta.env.PUBLIC_GTM_ID;
+const canonicalUrl = new URL(canonical, Astro.site ?? Astro.url.origin).toString();
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Ruijie Machinery",
+  url: Astro.site?.toString() ?? "https://www.example-ruijie.com",
+  description:
+    "Ruijie Machinery provides smart precast beam factory and smart girder yard solutions for bridge girder production.",
+  areaServed: ["Indonesia", "Saudi Arabia", "Philippines", "India", "Vietnam", "Malaysia", "UAE"],
+  knowsAbout: [
+    "Smart precast beam factory",
+    "Smart girder yard",
+    "Bridge girder production line",
+    "Mobile mold trolley",
+    "Precast beam curing system"
+  ]
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+    {gtmId && (
+      <script set:html={`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${gtmId}');`} />
+    )}
+  </head>
+  <body>
+    {gtmId && (
+      <noscript>
+        <iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`} height="0" width="0" style="display:none;visibility:hidden"></iframe>
+      </noscript>
+    )}
+    <slot />
+  </body>
+</html>
