@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>瑞捷新闻与资源编辑器</title>
+    <title>瑞捷 Markdown 编辑器</title>
     <style>
       :root {
         --ink: #17313d;
@@ -48,9 +48,9 @@
 
       main {
         display: grid;
-        grid-template-columns: minmax(360px, 0.92fr) minmax(360px, 1.08fr);
+        grid-template-columns: 1fr;
         gap: 24px;
-        width: min(1380px, calc(100% - 40px));
+        width: min(1200px, calc(100% - 40px));
         margin: 24px auto 42px;
       }
 
@@ -71,7 +71,7 @@
 
       form {
         display: grid;
-        gap: 16px;
+        gap: 24px;
       }
 
       label,
@@ -83,6 +83,49 @@
         border: 0;
         font-size: 14px;
         font-weight: 750;
+      }
+
+      /* Config section styling */
+      .config-section {
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #f8faf8;
+        margin-top: 4px;
+      }
+
+      .config-section summary {
+        padding: 4px;
+        font-size: 15px;
+        cursor: pointer;
+        user-select: none;
+        list-style: none;
+      }
+
+      .config-section summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .config-section summary::before {
+        content: "▶ ";
+        display: inline-block;
+        transition: transform 0.2s;
+      }
+
+      .config-section[open] summary::before {
+        transform: rotate(90deg);
+      }
+
+      .config-section summary:hover {
+        color: var(--green);
+      }
+
+      .config-content {
+        display: grid;
+        gap: 16px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--line);
       }
 
       input,
@@ -159,10 +202,19 @@
         cursor: pointer;
       }
 
+      button:hover {
+        background: #146057;
+      }
+
       button.secondary {
         color: var(--ink);
         background: var(--white);
         border-color: var(--line);
+      }
+
+      button.secondary:hover {
+        background: var(--paper);
+        border-color: var(--green);
       }
 
       .hint {
@@ -170,12 +222,6 @@
         font-size: 13px;
         font-weight: 500;
         line-height: 1.55;
-      }
-
-      .preview {
-        display: grid;
-        grid-template-rows: auto 1fr;
-        min-height: 680px;
       }
 
       .editor-shell {
@@ -193,8 +239,7 @@
         background: #f8faf8;
       }
 
-      .editor-toolbar button,
-      .image-upload-label {
+      .editor-toolbar button {
         min-height: 34px;
         padding: 0 11px;
         border: 1px solid var(--line);
@@ -206,19 +251,13 @@
         cursor: pointer;
       }
 
-      .image-upload-label {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+      .editor-toolbar button:hover {
+        background: var(--paper);
+        border-color: var(--green);
       }
 
-      .image-upload-label input {
-        display: none;
-      }
-
-      .visual-editor,
-      .article-preview {
-        min-height: 520px;
+      .visual-editor {
+        min-height: 420px;
         padding: 22px;
         border: 1px solid var(--line);
         border-radius: 8px;
@@ -265,13 +304,20 @@
         border-radius: 8px;
       }
 
-      .article-preview {
-        overflow: auto;
+      .preview {
+        display: none;
+        grid-template-rows: auto auto 1fr;
+        min-height: 500px;
+      }
+
+      .preview.visible {
+        display: grid;
       }
 
       .preview-head {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         gap: 14px;
         padding: 18px 20px;
         border-bottom: 1px solid var(--line);
@@ -282,22 +328,28 @@
         font-size: 18px;
       }
 
+      #close-preview {
+        min-height: 32px;
+        padding: 0 12px;
+        font-size: 13px;
+      }
+
+      .preview-meta {
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--line);
+        background: #f8faf8;
+        font-size: 13px;
+      }
+
       .url-preview {
         color: var(--green);
-        font-size: 13px;
         font-weight: 800;
         word-break: break-all;
       }
 
-      pre {
-        min-height: 0;
-        margin: 0;
-        padding: 20px;
+      .article-preview {
+        padding: 22px;
         overflow: auto;
-        color: #e9f3ef;
-        background: #17313d;
-        font-size: 13px;
-        line-height: 1.58;
       }
 
       .status {
@@ -329,119 +381,121 @@
       }
 
       @media (max-width: 980px) {
-        main,
         .row {
           grid-template-columns: 1fr;
         }
 
         main {
-          width: min(100% - 24px, 1380px);
+          width: calc(100% - 24px);
         }
       }
     </style>
   </head>
   <body>
     <header>
-      <h1>瑞捷新闻与资源编辑器</h1>
+      <h1>瑞捷 Markdown 编辑器</h1>
       <p>
-        不需要手写 frontmatter。你可以在这里填写标题、分类、发布日期、摘要和正文，草稿默认保存到 <strong>docs/resource-drafts/</strong>，
-        内容确认后也可以直接发布到 <strong>src/content/resources/</strong>，由网站自动生成新闻/资源页面。
+        编辑和发布 News & Resources 文章。填写标题和正文后，点击发布按钮会自动保存 Markdown 文件到 <strong>src/content/resources/</strong>，图片保存到 <strong>public/resource-images/</strong>。
       </p>
     </header>
 
     <main>
       <section class="panel">
-        <h2>文章信息</h2>
+        <h2>文章编辑</h2>
         <form id="resource-form">
+          <!-- 1. 标题和内容放在最前面 -->
           <label>
-            标题
-            <input id="title" name="title" required placeholder="例如：传统固定台座梁场 vs 智慧梁场" />
+            <strong style="font-size: 15px;">标题</strong>
+            <input id="title" name="title" required placeholder="例如：Traditional Fixed-Bed vs Smart Girder Yard" />
           </label>
-
-          <div class="row">
-            <label>
-              URL 地址
-              <input id="slug" name="slug" required placeholder="fixed-bed-vs-smart-girder-yard" />
-              <span class="hint">建议使用英文小写和连字符。最终地址会是 /resources/your-slug/。</span>
-            </label>
-            <label>
-              发布日期
-              <input id="date" name="date" type="date" required />
-            </label>
-          </div>
-
-          <div class="row">
-            <label>
-              分类
-              <select id="category" name="category" required></select>
-            </label>
-            <label>
-              标签
-              <input id="tags" name="tags" placeholder="smart girder yard, bridge girder production" />
-              <span class="hint">多个标签用英文逗号分隔。标签建议仍使用英文，便于海外SEO。</span>
-            </label>
-          </div>
-
-          <label>
-            SEO 摘要
-            <input id="description" name="description" placeholder="用一句话概括文章内容，用于搜索结果和资源列表页。" />
-          </label>
-
-          <fieldset>
-            保存位置
-            <div class="option-row">
-              <label><input type="radio" name="target" value="draft" checked /> 保存草稿到 docs</label>
-              <label><input type="radio" name="target" value="publish" /> 发布到网站</label>
-              <label><input type="radio" name="target" value="both" /> 草稿和发布都保存</label>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            选项
-            <div class="option-row">
-              <label><input id="featured" type="checkbox" /> 设为重点文章</label>
-              <label><input id="overwrite" type="checkbox" /> 允许覆盖同名文件</label>
-            </div>
-          </fieldset>
 
           <div class="editor-shell">
-            正文
+            <strong style="font-size: 15px;">正文内容</strong>
             <div class="editor-toolbar" aria-label="正文编辑工具栏">
-              <button type="button" data-command="formatBlock" data-value="h2">二级标题</button>
-              <button type="button" data-command="formatBlock" data-value="h3">三级标题</button>
-              <button type="button" data-command="formatBlock" data-value="p">正文段落</button>
-              <button type="button" data-command="insertUnorderedList">项目列表</button>
+              <button type="button" data-command="formatBlock" data-value="h2">H2 标题</button>
+              <button type="button" data-command="formatBlock" data-value="h3">H3 标题</button>
+              <button type="button" data-command="formatBlock" data-value="p">段落</button>
+              <button type="button" data-command="insertUnorderedList">列表</button>
               <button type="button" data-command="bold">加粗</button>
-              <label class="image-upload-label">
-                插入图片
-                <input id="image-upload" type="file" accept="image/*" />
-              </label>
+              <button type="button" id="insert-image-btn">插入图片</button>
             </div>
             <div id="body-editor" class="visual-editor" contenteditable="true" role="textbox" aria-label="正文可视化编辑区"></div>
-            <span class="hint">在这里直接排版正文。插入图片后，图片文件会保存到项目目录，并自动写入文章内容。</span>
+            <span class="hint">在这里直接排版正文。点击"插入图片"选择本地图片文件，图片会自动保存到 public/resource-images/ 并使用相对路径引用。</span>
           </div>
 
+          <!-- 2. 其他配置内容在下面 -->
+          <details class="config-section" open>
+            <summary><strong>文章配置</strong></summary>
+            <div class="config-content">
+              <div class="row">
+                <label>
+                  URL 地址
+                  <input id="slug" name="slug" required placeholder="fixed-bed-vs-smart-girder-yard" />
+                  <span class="hint">英文小写加连字符，最终地址：/resources/your-slug/</span>
+                </label>
+                <label>
+                  发布日期
+                  <input id="date" name="date" type="date" required />
+                </label>
+              </div>
+
+              <div class="row">
+                <label>
+                  分类
+                  <select id="category" name="category" required>
+                    <option value="">请选择分类</option>
+                  </select>
+                </label>
+                <label>
+                  标签
+                  <input id="tags" name="tags" placeholder="smart girder yard, precast beam" />
+                  <span class="hint">多个标签用英文逗号分隔</span>
+                </label>
+              </div>
+
+              <label>
+                SEO 摘要
+                <input id="description" name="description" placeholder="用一句话概括文章内容，用于搜索结果和列表页" />
+              </label>
+
+              <fieldset>
+                选项
+                <div class="option-row">
+                  <label><input id="featured" type="checkbox" /> 设为重点文章</label>
+                  <label><input id="overwrite" type="checkbox" /> 允许覆盖同名文件</label>
+                </div>
+              </fieldset>
+            </div>
+          </details>
+
           <div class="actions">
-            <button type="submit">保存 Markdown</button>
+            <button type="submit">发布到网站</button>
+            <button class="secondary" type="button" id="preview-btn">预览效果</button>
             <button class="secondary" type="button" id="refresh">刷新文件列表</button>
           </div>
           <div id="status" class="status" aria-live="polite"></div>
         </form>
 
         <div class="existing">
-          <strong>已有 Markdown 文件</strong>
+          <strong>已发布的文章</strong>
           <ul id="existing-files"></ul>
         </div>
       </section>
 
-      <section class="preview">
+      <section class="preview" id="preview-section">
         <div class="preview-head">
           <h2>文章预览</h2>
-          <div id="url-preview" class="url-preview">/resources/</div>
+          <button class="secondary" id="close-preview">关闭预览</button>
+        </div>
+        <div class="preview-meta">
+          <div><strong>URL:</strong> <span id="url-preview" class="url-preview">/resources/</span></div>
         </div>
         <article id="article-preview" class="article-preview"></article>
       </section>
     </main>
+
+    <!-- Hidden file input for images -->
+    <input id="image-upload" type="file" accept="image/*" style="display: none;" />
 
     <script type="module">
       const form = document.querySelector("#resource-form");
@@ -461,6 +515,10 @@
       const articlePreviewEl = document.querySelector("#article-preview");
       const urlPreviewEl = document.querySelector("#url-preview");
       const existingFilesEl = document.querySelector("#existing-files");
+      const previewSection = document.querySelector("#preview-section");
+      const previewBtn = document.querySelector("#preview-btn");
+      const closePreviewBtn = document.querySelector("#close-preview");
+      const insertImageBtn = document.querySelector("#insert-image-btn");
 
       function slugify(value) {
         return String(value || "")
@@ -482,10 +540,6 @@
           .split(",")
           .map((tag) => tag.trim())
           .filter(Boolean);
-      }
-
-      function getTarget() {
-        return new FormData(form).get("target") || "draft";
       }
 
       function escapeMarkdown(value) {
@@ -570,25 +624,6 @@
         return blocks.join("\n\n").trim();
       }
 
-      function buildMarkdown() {
-        const tags = getTags();
-        const tagLines = tags.length > 0 ? tags.map((tag) => `  - ${tag}`) : ["  - smart girder yard"];
-        const bodyMarkdown = editorHtmlToMarkdown();
-        return [
-          "---",
-          `title: "${escapeYaml(fields.title.value)}"`,
-          `description: "${escapeYaml(fields.description.value)}"`,
-          `date: "${fields.date.value}"`,
-          `category: "${escapeYaml(fields.category.value)}"`,
-          "tags:",
-          ...tagLines,
-          `featured: ${fields.featured.checked ? "true" : "false"}`,
-          "---",
-          "",
-          bodyMarkdown || "Write the article body here."
-        ].join("\n");
-      }
-
       function updatePreview() {
         const slug = slugify(fields.slug.value || fields.title.value);
         if (!fields.slug.matches(":focus")) {
@@ -601,21 +636,19 @@
       async function loadMeta() {
         const response = await fetch("/api/meta");
         const data = await response.json();
-        fields.category.innerHTML = data.categories
-          .map((category) => `<option value="${category.value}">${category.label}（${category.value}）</option>`)
-          .join("");
+        fields.category.innerHTML = '<option value="">请选择分类</option>' + 
+          data.categories
+            .map((category) => `<option value="${category.value}">${category.label}（${category.value}）</option>`)
+            .join("");
       }
 
       async function loadExistingFiles() {
         const response = await fetch("/api/articles");
         const data = await response.json();
-        const rows = [
-          ...data.drafts.map((item) => `草稿：docs/resource-drafts/${item.file}`),
-          ...data.published.map((item) => `已发布：src/content/resources/${item.file}`)
-        ];
-        existingFilesEl.innerHTML = rows.length > 0
-          ? rows.map((row) => `<li>${row}</li>`).join("")
-          : "<li>还没有 Markdown 文件。</li>";
+        const publishedRows = data.published.map((item) => `src/content/resources/${item.file}`);
+        existingFilesEl.innerHTML = publishedRows.length > 0
+          ? publishedRows.map((row) => `<li>${row}</li>`).join("")
+          : "<li>还没有发布的文章</li>";
       }
 
       function setStatus(message, isError = false) {
@@ -623,7 +656,24 @@
         statusEl.classList.toggle("error", isError);
       }
 
-      form.addEventListener("input", updatePreview);
+      // Preview toggle
+      previewBtn.addEventListener("click", () => {
+        updatePreview();
+        previewSection.classList.add("visible");
+        previewSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      closePreviewBtn.addEventListener("click", () => {
+        previewSection.classList.remove("visible");
+      });
+
+      form.addEventListener("input", () => {
+        // Update preview if visible
+        if (previewSection.classList.contains("visible")) {
+          updatePreview();
+        }
+      });
+
       document.querySelector("#refresh").addEventListener("click", loadExistingFiles);
 
       document.querySelectorAll("[data-command]").forEach((button) => {
@@ -632,8 +682,15 @@
           const command = button.dataset.command;
           const value = button.dataset.value;
           document.execCommand(command, false, value || null);
-          updatePreview();
+          if (previewSection.classList.contains("visible")) {
+            updatePreview();
+          }
         });
+      });
+
+      // Image insert button
+      insertImageBtn.addEventListener("click", () => {
+        fields.imageUpload.click();
       });
 
       fields.imageUpload.addEventListener("change", async () => {
@@ -667,7 +724,9 @@
           });
           fields.imageUpload.value = "";
           setStatus(`图片已保存：${data.files.join(", ")}`);
-          updatePreview();
+          if (previewSection.classList.contains("visible")) {
+            updatePreview();
+          }
         });
         reader.readAsDataURL(file);
       });
@@ -684,7 +743,7 @@
           description: fields.description.value,
           featured: fields.featured.checked,
           overwrite: fields.overwrite.checked,
-          target: getTarget(),
+          target: "publish", // Always publish to website
           body: editorHtmlToMarkdown()
         };
 
@@ -700,26 +759,27 @@
           return;
         }
 
-        setStatus(`已保存：${data.files.join(", ")}`);
+        setStatus(`已发布：${data.files.join(", ")}`);
         await loadExistingFiles();
       });
 
+      // 3. Set default date to today
       fields.date.value = new Date().toISOString().slice(0, 10);
+      
       fields.bodyEditor.innerHTML = `
-        <h2>背景</h2>
-        <p>在这里填写文章正文。</p>
-        <h2>关键内容</h2>
+        <h2>Background</h2>
+        <p>Start writing your article content here.</p>
+        <h2>Key Points</h2>
         <ul>
-          <li>要点一</li>
-          <li>要点二</li>
+          <li>Point one</li>
+          <li>Point two</li>
         </ul>
-        <h2>下一步</h2>
-        <p>引导读者联系瑞捷，进行项目沟通。</p>
+        <h2>Next Steps</h2>
+        <p>Guide readers to contact Ruijie for project consultation.</p>
       `;
 
       await loadMeta();
       await loadExistingFiles();
-      updatePreview();
     </script>
   </body>
 </html>
