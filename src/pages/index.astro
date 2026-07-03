@@ -21,15 +21,18 @@ const equipmentModules = [
 const newsItems = [
   {
     title: "Traditional Fixed-Bed Girder Yard vs Smart Girder Yard",
-    text: "A comparison guide for EPC teams evaluating schedule, labor, land use and quality control trade-offs."
+    text: "A comparison guide for EPC teams evaluating schedule, labor, land use and quality control trade-offs.",
+    href: "/resources/fixed-bed-vs-smart-girder-yard/"
   },
   {
     title: "What Project Data Is Needed Before Designing a Precast Beam Factory?",
-    text: "A practical checklist covering girder type, quantity, production period, yard area and delivery assumptions."
+    text: "A practical checklist covering girder type, quantity, production period, yard area and delivery assumptions.",
+    href: "/resources/project-data-for-precast-beam-factory-design/"
   },
   {
     title: "Why In-Mold Curing Matters in Precast Beam Production",
-    text: "A technical resource on curing consistency, energy options and quality documentation for infrastructure projects."
+    text: "A technical resource on curing consistency, energy options and quality documentation for infrastructure projects.",
+    href: "/resources/in-mold-curing-precast-beam-production/"
   }
 ];
 ---
@@ -140,10 +143,10 @@ const newsItems = [
       <div class="news-grid">
         {newsItems.map((item) => (
           <article class="news-card">
-            <span>Planned resource</span>
+            <span>Markdown resource</span>
             <h3>{item.title}</h3>
             <p>{item.text}</p>
-            <a href="/resources/">Read later</a>
+            <a href={item.href}>Read article</a>
           </article>
         ))}
       </div>

@@ -1,0 +1,67 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+
+export async function getStaticPaths() {
+  const resourceModules = import.meta.glob("../../content/resources/*.md", { eager: true });
+
+  return Object.entries(resourceModules).map(([path, module]) => {
+    const typedModule = module as {
+      frontmatter: {
+        title: string;
+        description?: string;
+        date?: string;
+        category?: string;
+        tags?: string[];
+      };
+      Content: unknown;
+    };
+    const slug = path.split("/").pop()?.replace(".md", "") ?? "";
+
+    return {
+      params: { slug },
+      props: {
+        entry: {
+          slug,
+          ...typedModule.frontmatter,
+          Content: typedModule.Content
+        }
+      }
+    };
+  });
+}
+
+const { entry } = Astro.props;
+const Content = entry.Content;
+---
+
+<BaseLayout
+  title={`${entry.title} | Ruijie Machinery`}
+  description={entry.description ?? "Ruijie Machinery news and technical resources."}
+  canonical={`/resources/${entry.slug}/`}
+>
+  <Header />
+  <main class="article-page">
+    <article class="container article-layout">
+      <a class="back-link" href="/resources/">Back to News & Resources</a>
+      <header class="article-header">
+        <p class="eyebrow">{entry.category ?? "Resource"}</p>
+        <h1>{entry.title}</h1>
+        <div class="article-meta">
+          {entry.date && <time datetime={entry.date}>{entry.date}</time>}
+          {entry.tags && entry.tags.length > 0 && (
+            <div class="tag-list">
+              {entry.tags.map((tag) => <span>{tag}</span>)}
+            </div>
+          )}
+        </div>
+        {entry.description && <p>{entry.description}</p>}
+      </header>
+      <div class="article-content">
+        <Content />
+      </div>
+    </article>
+  </main>
+  <Footer />
+</BaseLayout>

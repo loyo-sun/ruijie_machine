@@ -3,11 +3,32 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 
-const resources = [
-  "How Smart Girder Yards Help Reduce Land Use in Bridge Girder Production",
-  "Traditional Fixed-Bed Girder Yard vs Smart Girder Yard",
-  "What Project Data Is Needed Before Designing a Precast Beam Factory?"
-];
+const resourceModules = import.meta.glob("../../content/resources/*.md", { eager: true });
+
+const resources = Object.entries(resourceModules)
+  .map(([path, module]) => {
+    const typedModule = module as {
+      frontmatter: {
+        title: string;
+        description?: string;
+        date?: string;
+        category?: string;
+        tags?: string[];
+        featured?: boolean;
+      };
+    };
+    const slug = path.split("/").pop()?.replace(".md", "") ?? "";
+
+    return {
+      slug,
+      ...typedModule.frontmatter
+    };
+  })
+  .sort((a, b) => {
+    const dateA = new Date(a.date ?? "1970-01-01").getTime();
+    const dateB = new Date(b.date ?? "1970-01-01").getTime();
+    return dateB - dateA;
+  });
 ---
 
 <BaseLayout
@@ -26,9 +47,18 @@ const resources = [
       <div class="resource-list">
         {resources.map((item) => (
           <article>
-            <span>Planned article</span>
-            <h2>{item}</h2>
-            <p>Draft content placeholder for SEO validation and sales enablement.</p>
+            <span>{item.category ?? "Resource"}{item.featured ? " / Featured" : ""}</span>
+            <h2>
+              <a href={`/resources/${item.slug}/`}>{item.title}</a>
+            </h2>
+            {item.date && <time datetime={item.date}>{item.date}</time>}
+            <p>{item.description}</p>
+            {item.tags && item.tags.length > 0 && (
+              <div class="tag-list">
+                {item.tags.map((tag) => <span>{tag}</span>)}
+              </div>
+            )}
+            <a class="text-link" href={`/resources/${item.slug}/`}>Read article</a>
           </article>
         ))}
       </div>
