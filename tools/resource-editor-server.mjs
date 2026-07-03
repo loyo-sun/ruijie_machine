@@ -183,6 +183,37 @@ const server = createServer(async (request, response) => {
       return;
     }
 
+    // Serve static images from public/resource-images/
+    if (request.method === "GET" && url.pathname.startsWith("/resource-images/")) {
+      const fileName = url.pathname.replace("/resource-images/", "");
+      const imagePath = path.join(publicImageDir, fileName);
+      
+      try {
+        const imageData = await readFile(imagePath);
+        const ext = path.extname(fileName).toLowerCase();
+        const mimeTypes = {
+          ".jpg": "image/jpeg",
+          ".jpeg": "image/jpeg",
+          ".png": "image/png",
+          ".gif": "image/gif",
+          ".webp": "image/webp",
+          ".svg": "image/svg+xml"
+        };
+        const contentType = mimeTypes[ext] || "application/octet-stream";
+        
+        response.writeHead(200, {
+          "content-type": contentType,
+          "cache-control": "public, max-age=31536000"
+        });
+        response.end(imageData);
+        return;
+      } catch (err) {
+        response.writeHead(404, { "content-type": "text/plain" });
+        response.end("Image not found");
+        return;
+      }
+    }
+
     if (request.method === "GET" && url.pathname === "/api/meta") {
       sendJson(response, 200, { categories });
       return;
