@@ -689,46 +689,83 @@
       });
 
       // Image insert button
-      insertImageBtn.addEventListener("click", () => {
+      insertImageBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        console.log("插入图片按钮被点击");
         fields.imageUpload.click();
       });
 
       fields.imageUpload.addEventListener("change", async () => {
         const file = fields.imageUpload.files?.[0];
+        console.log("文件选择:", file);
         if (!file) return;
 
         setStatus("正在上传图片...");
-        const reader = new FileReader();
-        reader.addEventListener("load", async () => {
-          const response = await fetch("/api/upload-image", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              name: file.name,
-              type: file.type,
-              data: reader.result
-            })
-          });
-          const data = await response.json();
+        
+        try {
+          const reader = new FileReader();
+          reader.addEventListener("load", async () => {
+            try {
+              console.log("开始上传图片:", file.name);
+              const response = await fetch("/api/upload-image", {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                  name: file.name,
+                  type: file.type,
+                  data: reader.result
+                })
+              });
+              
+              const data = await response.json();
+              console.log("服务器响应:", data);
 
-          if (!response.ok) {
-            setStatus(data.error || "图片上传失败。", true);
-            return;
-          }
+              if (!response.ok) {
+                setStatus(data.error || "图片上传失败。", true);
+                return;
+              }
 
-          fields.bodyEditor.focus();
-          document.execCommand("insertImage", false, data.url);
-          const images = fields.bodyEditor.querySelectorAll(`img[src="${data.url}"]`);
-          images.forEach((img) => {
-            img.alt = file.name.replace(/\.[^.]+$/, "");
+              // 使用 insertHTML 替代 insertImage，更可靠
+              fields.bodyEditor.focus();
+              const selection = window.getSelection();
+              const range = selection.getRangeAt(0);
+              range.deleteContents();
+              
+              const img = document.createElement('img');
+              img.src = data.url;
+              img.alt = file.name.replace(/\.[^.]+$/, "");
+              img.style.maxWidth = '100%';
+              
+              range.insertNode(img);
+              
+              // 在图片后添加一个空段落，方便继续编辑
+              const p = document.createElement('p');
+              p.innerHTML = '<br>';
+              img.parentNode.insertBefore(p, img.nextSibling);
+              
+              fields.imageUpload.value = "";
+              setStatus(`✓ 图片已插入：${file.name}`);
+              console.log("图片插入成功");
+              
+              if (previewSection.classList.contains("visible")) {
+                updatePreview();
+              }
+            } catch (err) {
+              console.error("图片上传错误:", err);
+              setStatus(`上传失败: ${err.message}`, true);
+            }
           });
-          fields.imageUpload.value = "";
-          setStatus(`图片已保存：${data.files.join(", ")}`);
-          if (previewSection.classList.contains("visible")) {
-            updatePreview();
-          }
-        });
-        reader.readAsDataURL(file);
+          
+          reader.addEventListener("error", () => {
+            console.error("文件读取失败");
+            setStatus("文件读取失败", true);
+          });
+          
+          reader.readAsDataURL(file);
+        } catch (err) {
+          console.error("处理图片时出错:", err);
+          setStatus(`处理失败: ${err.message}`, true);
+        }
       });
 
       form.addEventListener("submit", async (event) => {
