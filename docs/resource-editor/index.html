@@ -178,6 +178,97 @@
         min-height: 680px;
       }
 
+      .editor-shell {
+        display: grid;
+        gap: 10px;
+      }
+
+      .editor-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #f8faf8;
+      }
+
+      .editor-toolbar button,
+      .image-upload-label {
+        min-height: 34px;
+        padding: 0 11px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        color: var(--ink);
+        background: var(--white);
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .image-upload-label {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .image-upload-label input {
+        display: none;
+      }
+
+      .visual-editor,
+      .article-preview {
+        min-height: 520px;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--white);
+        line-height: 1.75;
+      }
+
+      .visual-editor:focus {
+        outline: 3px solid rgba(23, 114, 103, 0.16);
+        border-color: var(--green);
+      }
+
+      .visual-editor h2,
+      .article-preview h2 {
+        margin: 28px 0 12px;
+        font-size: 24px;
+      }
+
+      .visual-editor h3,
+      .article-preview h3 {
+        margin: 22px 0 10px;
+        font-size: 18px;
+      }
+
+      .visual-editor p,
+      .article-preview p {
+        margin: 0 0 14px;
+        color: var(--ink-soft);
+      }
+
+      .visual-editor ul,
+      .article-preview ul {
+        margin: 0 0 16px;
+        padding-left: 22px;
+        color: var(--ink-soft);
+      }
+
+      .visual-editor img,
+      .article-preview img {
+        display: block;
+        max-width: 100%;
+        margin: 18px 0 8px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      .article-preview {
+        overflow: auto;
+      }
+
       .preview-head {
         display: flex;
         justify-content: space-between;
@@ -313,10 +404,22 @@
             </div>
           </fieldset>
 
-          <label>
+          <div class="editor-shell">
             正文
-            <textarea id="body" name="body" required placeholder="在这里填写正文。可以使用 Markdown 标题、列表和段落。"></textarea>
-          </label>
+            <div class="editor-toolbar" aria-label="正文编辑工具栏">
+              <button type="button" data-command="formatBlock" data-value="h2">二级标题</button>
+              <button type="button" data-command="formatBlock" data-value="h3">三级标题</button>
+              <button type="button" data-command="formatBlock" data-value="p">正文段落</button>
+              <button type="button" data-command="insertUnorderedList">项目列表</button>
+              <button type="button" data-command="bold">加粗</button>
+              <label class="image-upload-label">
+                插入图片
+                <input id="image-upload" type="file" accept="image/*" />
+              </label>
+            </div>
+            <div id="body-editor" class="visual-editor" contenteditable="true" role="textbox" aria-label="正文可视化编辑区"></div>
+            <span class="hint">在这里直接排版正文。插入图片后，图片文件会保存到项目目录，并自动写入文章内容。</span>
+          </div>
 
           <div class="actions">
             <button type="submit">保存 Markdown</button>
@@ -333,10 +436,10 @@
 
       <section class="preview">
         <div class="preview-head">
-          <h2>Markdown 预览</h2>
+          <h2>文章预览</h2>
           <div id="url-preview" class="url-preview">/resources/</div>
         </div>
-        <pre id="markdown-preview"></pre>
+        <article id="article-preview" class="article-preview"></article>
       </section>
     </main>
 
@@ -351,10 +454,11 @@
         description: document.querySelector("#description"),
         featured: document.querySelector("#featured"),
         overwrite: document.querySelector("#overwrite"),
-        body: document.querySelector("#body")
+        bodyEditor: document.querySelector("#body-editor"),
+        imageUpload: document.querySelector("#image-upload")
       };
       const statusEl = document.querySelector("#status");
-      const previewEl = document.querySelector("#markdown-preview");
+      const articlePreviewEl = document.querySelector("#article-preview");
       const urlPreviewEl = document.querySelector("#url-preview");
       const existingFilesEl = document.querySelector("#existing-files");
 
@@ -384,9 +488,92 @@
         return new FormData(form).get("target") || "draft";
       }
 
+      function escapeMarkdown(value) {
+        return String(value || "").replace(/\[/g, "\\[").replace(/\]/g, "\\]");
+      }
+
+      function inlineMarkdown(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          return node.textContent || "";
+        }
+
+        if (node.nodeType !== Node.ELEMENT_NODE) {
+          return "";
+        }
+
+        const element = node;
+        const text = Array.from(element.childNodes).map(inlineMarkdown).join("");
+
+        if (element.tagName === "STRONG" || element.tagName === "B") {
+          return `**${text}**`;
+        }
+
+        if (element.tagName === "EM" || element.tagName === "I") {
+          return `*${text}*`;
+        }
+
+        if (element.tagName === "BR") {
+          return "\n";
+        }
+
+        return text;
+      }
+
+      function editorHtmlToMarkdown() {
+        const blocks = [];
+
+        for (const node of fields.bodyEditor.childNodes) {
+          if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent.trim();
+            if (text) blocks.push(text);
+            continue;
+          }
+
+          if (node.nodeType !== Node.ELEMENT_NODE) {
+            continue;
+          }
+
+          const element = node;
+          const tag = element.tagName;
+
+          if (tag === "H2") {
+            blocks.push(`## ${inlineMarkdown(element).trim()}`);
+          } else if (tag === "H3") {
+            blocks.push(`### ${inlineMarkdown(element).trim()}`);
+          } else if (tag === "UL") {
+            const items = Array.from(element.querySelectorAll(":scope > li"))
+              .map((item) => `- ${inlineMarkdown(item).trim()}`)
+              .filter((item) => item !== "-");
+            if (items.length) blocks.push(items.join("\n"));
+          } else if (tag === "IMG") {
+            const src = element.getAttribute("src") || "";
+            const alt = element.getAttribute("alt") || "Resource image";
+            if (src) blocks.push(`![${escapeMarkdown(alt)}](${src})`);
+          } else if (tag === "FIGURE") {
+            const img = element.querySelector("img");
+            if (img) {
+              const src = img.getAttribute("src") || "";
+              const alt = img.getAttribute("alt") || "Resource image";
+              if (src) blocks.push(`![${escapeMarkdown(alt)}](${src})`);
+            }
+          } else {
+            const text = inlineMarkdown(element).trim();
+            if (text) blocks.push(text);
+            for (const img of element.querySelectorAll("img")) {
+              const src = img.getAttribute("src") || "";
+              const alt = img.getAttribute("alt") || "Resource image";
+              if (src) blocks.push(`![${escapeMarkdown(alt)}](${src})`);
+            }
+          }
+        }
+
+        return blocks.join("\n\n").trim();
+      }
+
       function buildMarkdown() {
         const tags = getTags();
         const tagLines = tags.length > 0 ? tags.map((tag) => `  - ${tag}`) : ["  - smart girder yard"];
+        const bodyMarkdown = editorHtmlToMarkdown();
         return [
           "---",
           `title: "${escapeYaml(fields.title.value)}"`,
@@ -398,7 +585,7 @@
           `featured: ${fields.featured.checked ? "true" : "false"}`,
           "---",
           "",
-          fields.body.value || "Write the article body here."
+          bodyMarkdown || "Write the article body here."
         ].join("\n");
       }
 
@@ -408,7 +595,7 @@
           fields.slug.value = slug;
         }
         urlPreviewEl.textContent = slug ? `/resources/${slug}/` : "/resources/";
-        previewEl.textContent = buildMarkdown();
+        articlePreviewEl.innerHTML = fields.bodyEditor.innerHTML;
       }
 
       async function loadMeta() {
@@ -439,6 +626,52 @@
       form.addEventListener("input", updatePreview);
       document.querySelector("#refresh").addEventListener("click", loadExistingFiles);
 
+      document.querySelectorAll("[data-command]").forEach((button) => {
+        button.addEventListener("click", () => {
+          fields.bodyEditor.focus();
+          const command = button.dataset.command;
+          const value = button.dataset.value;
+          document.execCommand(command, false, value || null);
+          updatePreview();
+        });
+      });
+
+      fields.imageUpload.addEventListener("change", async () => {
+        const file = fields.imageUpload.files?.[0];
+        if (!file) return;
+
+        setStatus("正在上传图片...");
+        const reader = new FileReader();
+        reader.addEventListener("load", async () => {
+          const response = await fetch("/api/upload-image", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              name: file.name,
+              type: file.type,
+              data: reader.result
+            })
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            setStatus(data.error || "图片上传失败。", true);
+            return;
+          }
+
+          fields.bodyEditor.focus();
+          document.execCommand("insertImage", false, data.url);
+          const images = fields.bodyEditor.querySelectorAll(`img[src="${data.url}"]`);
+          images.forEach((img) => {
+            img.alt = file.name.replace(/\.[^.]+$/, "");
+          });
+          fields.imageUpload.value = "";
+          setStatus(`图片已保存：${data.files.join(", ")}`);
+          updatePreview();
+        });
+        reader.readAsDataURL(file);
+      });
+
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
         setStatus("正在保存...");
@@ -452,7 +685,7 @@
           featured: fields.featured.checked,
           overwrite: fields.overwrite.checked,
           target: getTarget(),
-          body: fields.body.value
+          body: editorHtmlToMarkdown()
         };
 
         const response = await fetch("/api/save", {
@@ -472,7 +705,17 @@
       });
 
       fields.date.value = new Date().toISOString().slice(0, 10);
-      fields.body.value = "## 背景\n\n在这里填写文章正文。\n\n## 关键内容\n\n- 要点一\n- 要点二\n\n## 下一步\n\n引导读者联系瑞捷，进行项目沟通。";
+      fields.bodyEditor.innerHTML = `
+        <h2>背景</h2>
+        <p>在这里填写文章正文。</p>
+        <h2>关键内容</h2>
+        <ul>
+          <li>要点一</li>
+          <li>要点二</li>
+        </ul>
+        <h2>下一步</h2>
+        <p>引导读者联系瑞捷，进行项目沟通。</p>
+      `;
 
       await loadMeta();
       await loadExistingFiles();

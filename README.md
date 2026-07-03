@@ -69,3 +69,11 @@ src/content/resources/
 ```text
 docs/markdown-content-maintenance.md
 ```
+
+## Netlify Forms
+
+询盘表单部署和后台设置说明见：
+
+```text
+docs/netlify-forms-setup.md
+```

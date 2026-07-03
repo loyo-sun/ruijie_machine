@@ -431,6 +431,15 @@ p {
   line-height: 1.78;
 }
 
+.article-content img {
+  display: block;
+  max-width: 100%;
+  margin: 28px 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+
 .article-content ul {
   padding-left: 22px;
 }

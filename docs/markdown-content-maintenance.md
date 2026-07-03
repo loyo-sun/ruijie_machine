@@ -74,6 +74,8 @@ http://127.0.0.1:4388/
 - 输入 SEO 摘要
 - 输入逗号分隔的标签
 - 勾选是否设为重点文章
+- 在可视化正文编辑区中排版文章
+- 上传图片并自动保存到项目图片目录
 - 选择保存目标
 
 保存目标说明：
@@ -91,3 +93,20 @@ fixed-bed-vs-smart-girder-yard
 ```
 
 如果标题是中文，编辑器不会自动生成可用英文 URL，需要手动填写。
+
+## 图片保存
+
+在编辑器中点击 `插入图片` 后，图片会保存到两个位置：
+
+```text
+public/resource-images/
+docs/resource-drafts/assets/
+```
+
+Markdown正文会自动插入类似下面的图片地址：
+
+```markdown
+![Image alt](/resource-images/image-name.png)
+```
+
+`public/resource-images/` 中的图片会随网站一起部署到 Netlify，因此发布后的文章可以正常显示图片。

@@ -1,5 +1,5 @@
 import { createServer } from "node:http";
-import { readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -8,7 +8,9 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "..");
 const editorFile = path.join(rootDir, "docs", "resource-editor", "index.html");
 const draftDir = path.join(rootDir, "docs", "resource-drafts");
+const draftImageDir = path.join(rootDir, "docs", "resource-drafts", "assets");
 const publishDir = path.join(rootDir, "src", "content", "resources");
+const publicImageDir = path.join(rootDir, "public", "resource-images");
 const port = Number(process.env.RESOURCE_EDITOR_PORT ?? 4388);
 const host = "127.0.0.1";
 
@@ -38,6 +40,29 @@ function slugify(value) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 90);
+}
+
+function sanitizeFileBase(value) {
+  return slugify(value).replace(/^-+|-+$/g, "") || "resource-image";
+}
+
+function getImageExtension(mimeType, fileName) {
+  const extensionFromName = path.extname(String(fileName ?? "")).toLowerCase().replace(".", "");
+  const allowedExtensions = new Set(["jpg", "jpeg", "png", "webp", "gif", "svg"]);
+
+  if (allowedExtensions.has(extensionFromName)) {
+    return extensionFromName;
+  }
+
+  const mimeMap = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/gif": "gif",
+    "image/svg+xml": "svg"
+  };
+
+  return mimeMap[mimeType] ?? "";
 }
 
 function escapeYaml(value) {
@@ -138,6 +163,15 @@ async function readBody(request) {
   return Buffer.concat(chunks).toString("utf8");
 }
 
+async function ensureDirectories() {
+  await Promise.all([
+    mkdir(draftDir, { recursive: true }),
+    mkdir(draftImageDir, { recursive: true }),
+    mkdir(publishDir, { recursive: true }),
+    mkdir(publicImageDir, { recursive: true })
+  ]);
+}
+
 const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url ?? "/", `http://${host}:${port}`);
@@ -163,6 +197,55 @@ const server = createServer(async (request, response) => {
       return;
     }
 
+    if (request.method === "POST" && url.pathname === "/api/upload-image") {
+      const rawBody = await readBody(request);
+      const payload = JSON.parse(rawBody);
+      const mimeType = String(payload.type ?? "");
+      const extension = getImageExtension(mimeType, payload.name);
+
+      if (!extension || !mimeType.startsWith("image/")) {
+        sendJson(response, 400, { ok: false, error: "请上传 jpg、png、webp、gif 或 svg 图片。" });
+        return;
+      }
+
+      const base64 = String(payload.data ?? "").split(",").pop() ?? "";
+      const buffer = Buffer.from(base64, "base64");
+
+      if (!buffer.length) {
+        sendJson(response, 400, { ok: false, error: "图片内容为空。" });
+        return;
+      }
+
+      if (buffer.length > 5 * 1024 * 1024) {
+        sendJson(response, 400, { ok: false, error: "图片不能超过 5MB。" });
+        return;
+      }
+
+      await ensureDirectories();
+
+      const sourceBase = sanitizeFileBase(path.basename(String(payload.name ?? "resource-image"), path.extname(String(payload.name ?? ""))));
+      const timestamp = new Date().toISOString().replace(/[-:TZ.]/g, "").slice(0, 14);
+      const fileName = `${sourceBase}-${timestamp}.${extension}`;
+      const publicPath = path.join(publicImageDir, fileName);
+      const draftPath = path.join(draftImageDir, fileName);
+
+      await Promise.all([
+        writeFile(publicPath, buffer),
+        writeFile(draftPath, buffer)
+      ]);
+
+      sendJson(response, 200, {
+        ok: true,
+        fileName,
+        url: `/resource-images/${fileName}`,
+        files: [
+          path.relative(rootDir, publicPath),
+          path.relative(rootDir, draftPath)
+        ]
+      });
+      return;
+    }
+
     if (request.method === "POST" && url.pathname === "/api/save") {
       const rawBody = await readBody(request);
       const payload = JSON.parse(rawBody);
@@ -176,6 +259,8 @@ const server = createServer(async (request, response) => {
       const value = validation.value;
       const markdown = buildMarkdown(value);
       const destinations = [];
+
+      await ensureDirectories();
 
       if (value.target === "draft" || value.target === "both") {
         destinations.push(path.join(draftDir, `${value.slug}.md`));
