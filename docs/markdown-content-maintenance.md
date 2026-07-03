@@ -1,4 +1,4 @@
-# Markdown Resource Maintenance
+# Markdown 新闻/资源内容维护
 
 在 `src/content/resources/` 文件夹中新增 `.md` 文件，即可生成新闻/资源详情页，并自动出现在 `/resources/` 列表页。
 
@@ -17,7 +17,7 @@ project-data-for-precast-beam-factory-design.md
 /resources/fixed-bed-vs-smart-girder-yard/
 ```
 
-## Frontmatter 模板
+## Markdown 字段模板
 
 ```markdown
 ---
@@ -53,7 +53,7 @@ Article body starts here.
 
 ## 可视化编辑器
 
-如果不想手写 Markdown frontmatter，可以启动本地编辑器：
+如果不想手写 Markdown frontmatter，可以启动本地可视化编辑器：
 
 ```bash
 npm run editor
@@ -67,18 +67,27 @@ http://127.0.0.1:4388/
 
 编辑器支持：
 
-- 输入标题后自动生成 URL slug
-- 点选分类
-- 输入发布日期
-- 输入SEO描述
+- 输入标题
+- 手动输入 URL 地址 slug
+- 点选中文分类，保存时写入英文分类值
+- 选择发布日期
+- 输入 SEO 摘要
 - 输入逗号分隔的标签
-- 勾选是否 Featured
+- 勾选是否设为重点文章
 - 选择保存目标
 
 保存目标说明：
 
-- `Save draft in docs`：保存到 `docs/resource-drafts/`，适合先存草稿。
-- `Publish to website`：保存到 `src/content/resources/`，会生成网站文章页。
-- `Save both`：同时保存草稿和发布内容。
+- `保存草稿到 docs`：保存到 `docs/resource-drafts/`，适合先存草稿，不会生成网站页面。
+- `发布到网站`：保存到 `src/content/resources/`，会生成网站文章页。
+- `草稿和发布都保存`：同时保存草稿和发布内容。
 
-如果文件名已存在，编辑器会阻止覆盖；需要替换旧文件时，勾选 `Allow overwrite`。
+如果文件名已存在，编辑器会阻止覆盖；需要替换旧文件时，勾选 `允许覆盖同名文件`。
+
+注意：URL slug 建议使用英文小写和连字符，例如：
+
+```text
+fixed-bed-vs-smart-girder-yard
+```
+
+如果标题是中文，编辑器不会自动生成可用英文 URL，需要手动填写。

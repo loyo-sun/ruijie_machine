@@ -13,12 +13,12 @@ const port = Number(process.env.RESOURCE_EDITOR_PORT ?? 4388);
 const host = "127.0.0.1";
 
 const categories = [
-  "News",
-  "Comparison",
-  "Planning Guide",
-  "Technical Resource",
-  "Case Study",
-  "Company Update"
+  { label: "新闻动态", value: "News" },
+  { label: "对比分析", value: "Comparison" },
+  { label: "规划指南", value: "Planning Guide" },
+  { label: "技术资料", value: "Technical Resource" },
+  { label: "案例研究", value: "Case Study" },
+  { label: "公司更新", value: "Company Update" }
 ];
 
 function sendJson(response, statusCode, payload) {
@@ -83,11 +83,11 @@ function validatePayload(payload) {
   const slug = slugify(payload.slug || title);
   const target = payload.target === "publish" || payload.target === "both" ? payload.target : "draft";
 
-  if (!title) return { error: "Title is required." };
-  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: "Date must use YYYY-MM-DD." };
-  if (!category) return { error: "Category is required." };
-  if (!body) return { error: "Article body is required." };
-  if (!slug) return { error: "URL slug is required." };
+  if (!title) return { error: "请填写标题。" };
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: "发布日期必须使用 YYYY-MM-DD 格式。" };
+  if (!category) return { error: "请选择分类。" };
+  if (!body) return { error: "请填写正文内容。" };
+  if (!slug) return { error: "请填写或生成 URL slug。" };
 
   return {
     value: {
@@ -195,7 +195,7 @@ const server = createServer(async (request, response) => {
       if (existing.length > 0 && !value.overwrite) {
         sendJson(response, 409, {
           ok: false,
-          error: "File already exists. Enable overwrite to replace it.",
+          error: "文件已存在。如需替换，请勾选“允许覆盖”。",
           existing
         });
         return;
@@ -213,15 +213,15 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    sendJson(response, 404, { ok: false, error: "Not found." });
+    sendJson(response, 404, { ok: false, error: "未找到请求的接口。" });
   } catch (error) {
     sendJson(response, 500, {
       ok: false,
-      error: error instanceof Error ? error.message : "Unknown server error."
+      error: error instanceof Error ? error.message : "未知服务错误。"
     });
   }
 });
 
 server.listen(port, host, () => {
-  console.log(`Resource editor running at http://${host}:${port}/`);
+  console.log(`资源编辑器已启动：http://${host}:${port}/`);
 });

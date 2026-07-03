@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ruijie Resource Editor</title>
+    <title>瑞捷新闻与资源编辑器</title>
     <style>
       :root {
         --ink: #17313d;
@@ -251,89 +251,89 @@
   </head>
   <body>
     <header>
-      <h1>Ruijie News & Resource Editor</h1>
+      <h1>瑞捷新闻与资源编辑器</h1>
       <p>
-        Create Markdown news/resource files without hand-writing frontmatter. Save drafts to <strong>docs/resource-drafts/</strong>,
-        or publish directly to <strong>src/content/resources/</strong> when the article is ready for the website.
+        不需要手写 frontmatter。你可以在这里填写标题、分类、发布日期、摘要和正文，草稿默认保存到 <strong>docs/resource-drafts/</strong>，
+        内容确认后也可以直接发布到 <strong>src/content/resources/</strong>，由网站自动生成新闻/资源页面。
       </p>
     </header>
 
     <main>
       <section class="panel">
-        <h2>Article fields</h2>
+        <h2>文章信息</h2>
         <form id="resource-form">
           <label>
-            Title
-            <input id="title" name="title" required placeholder="Traditional Fixed-Bed Girder Yard vs Smart Girder Yard" />
+            标题
+            <input id="title" name="title" required placeholder="例如：传统固定台座梁场 vs 智慧梁场" />
           </label>
 
           <div class="row">
             <label>
-              URL slug
+              URL 地址
               <input id="slug" name="slug" required placeholder="fixed-bed-vs-smart-girder-yard" />
-              <span class="hint">Lowercase English and hyphens. This becomes /resources/your-slug/.</span>
+              <span class="hint">建议使用英文小写和连字符。最终地址会是 /resources/your-slug/。</span>
             </label>
             <label>
-              Date
+              发布日期
               <input id="date" name="date" type="date" required />
             </label>
           </div>
 
           <div class="row">
             <label>
-              Category
+              分类
               <select id="category" name="category" required></select>
             </label>
             <label>
-              Tags
+              标签
               <input id="tags" name="tags" placeholder="smart girder yard, bridge girder production" />
-              <span class="hint">Separate tags with commas.</span>
+              <span class="hint">多个标签用英文逗号分隔。标签建议仍使用英文，便于海外SEO。</span>
             </label>
           </div>
 
           <label>
-            SEO description
-            <input id="description" name="description" placeholder="One sentence summary for search and list pages." />
+            SEO 摘要
+            <input id="description" name="description" placeholder="用一句话概括文章内容，用于搜索结果和资源列表页。" />
           </label>
 
           <fieldset>
-            Save target
+            保存位置
             <div class="option-row">
-              <label><input type="radio" name="target" value="draft" checked /> Save draft in docs</label>
-              <label><input type="radio" name="target" value="publish" /> Publish to website</label>
-              <label><input type="radio" name="target" value="both" /> Save both</label>
+              <label><input type="radio" name="target" value="draft" checked /> 保存草稿到 docs</label>
+              <label><input type="radio" name="target" value="publish" /> 发布到网站</label>
+              <label><input type="radio" name="target" value="both" /> 草稿和发布都保存</label>
             </div>
           </fieldset>
 
           <fieldset>
-            Options
+            选项
             <div class="option-row">
-              <label><input id="featured" type="checkbox" /> Featured article</label>
-              <label><input id="overwrite" type="checkbox" /> Allow overwrite</label>
+              <label><input id="featured" type="checkbox" /> 设为重点文章</label>
+              <label><input id="overwrite" type="checkbox" /> 允许覆盖同名文件</label>
             </div>
           </fieldset>
 
           <label>
-            Article body
-            <textarea id="body" name="body" required placeholder="Write the article body here. You can use Markdown headings, lists and paragraphs."></textarea>
+            正文
+            <textarea id="body" name="body" required placeholder="在这里填写正文。可以使用 Markdown 标题、列表和段落。"></textarea>
           </label>
 
           <div class="actions">
-            <button type="submit">Save Markdown</button>
-            <button class="secondary" type="button" id="refresh">Refresh existing files</button>
+            <button type="submit">保存 Markdown</button>
+            <button class="secondary" type="button" id="refresh">刷新文件列表</button>
           </div>
           <div id="status" class="status" aria-live="polite"></div>
         </form>
 
         <div class="existing">
-          <strong>Existing Markdown files</strong>
+          <strong>已有 Markdown 文件</strong>
           <ul id="existing-files"></ul>
         </div>
       </section>
 
       <section class="preview">
         <div class="preview-head">
-          <h2>Markdown preview</h2>
+          <h2>Markdown 预览</h2>
           <div id="url-preview" class="url-preview">/resources/</div>
         </div>
         <pre id="markdown-preview"></pre>
@@ -415,7 +415,7 @@
         const response = await fetch("/api/meta");
         const data = await response.json();
         fields.category.innerHTML = data.categories
-          .map((category) => `<option value="${category}">${category}</option>`)
+          .map((category) => `<option value="${category.value}">${category.label}（${category.value}）</option>`)
           .join("");
       }
 
@@ -423,12 +423,12 @@
         const response = await fetch("/api/articles");
         const data = await response.json();
         const rows = [
-          ...data.drafts.map((item) => `Draft: docs/resource-drafts/${item.file}`),
-          ...data.published.map((item) => `Published: src/content/resources/${item.file}`)
+          ...data.drafts.map((item) => `草稿：docs/resource-drafts/${item.file}`),
+          ...data.published.map((item) => `已发布：src/content/resources/${item.file}`)
         ];
         existingFilesEl.innerHTML = rows.length > 0
           ? rows.map((row) => `<li>${row}</li>`).join("")
-          : "<li>No Markdown files found.</li>";
+          : "<li>还没有 Markdown 文件。</li>";
       }
 
       function setStatus(message, isError = false) {
@@ -441,7 +441,7 @@
 
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
-        setStatus("Saving...");
+        setStatus("正在保存...");
         const payload = {
           title: fields.title.value,
           slug: fields.slug.value,
@@ -463,16 +463,16 @@
         const data = await response.json();
 
         if (!response.ok) {
-          setStatus(data.error || "Save failed.", true);
+          setStatus(data.error || "保存失败。", true);
           return;
         }
 
-        setStatus(`Saved: ${data.files.join(", ")}`);
+        setStatus(`已保存：${data.files.join(", ")}`);
         await loadExistingFiles();
       });
 
       fields.date.value = new Date().toISOString().slice(0, 10);
-      fields.body.value = "## Background\n\nWrite the article body here.\n\n## Key Points\n\n- Point one\n- Point two\n\n## Next Step\n\nInvite readers to contact Ruijie for project discussion.";
+      fields.body.value = "## 背景\n\n在这里填写文章正文。\n\n## 关键内容\n\n- 要点一\n- 要点二\n\n## 下一步\n\n引导读者联系瑞捷，进行项目沟通。";
 
       await loadMeta();
       await loadExistingFiles();
