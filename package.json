@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
+    "editor": "node tools/resource-editor-server.mjs",
     "build": "astro build",
     "preview": "astro preview"
   },

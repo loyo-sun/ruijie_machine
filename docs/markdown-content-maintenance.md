@@ -50,3 +50,35 @@ Article body starts here.
 3. 在正文区用 Markdown 编写文章。
 4. 运行 `npm run build` 验证。
 5. 提交并推送到 GitHub，Netlify 会自动重新部署。
+
+## 可视化编辑器
+
+如果不想手写 Markdown frontmatter，可以启动本地编辑器：
+
+```bash
+npm run editor
+```
+
+然后打开：
+
+```text
+http://127.0.0.1:4388/
+```
+
+编辑器支持：
+
+- 输入标题后自动生成 URL slug
+- 点选分类
+- 输入发布日期
+- 输入SEO描述
+- 输入逗号分隔的标签
+- 勾选是否 Featured
+- 选择保存目标
+
+保存目标说明：
+
+- `Save draft in docs`：保存到 `docs/resource-drafts/`，适合先存草稿。
+- `Publish to website`：保存到 `src/content/resources/`，会生成网站文章页。
+- `Save both`：同时保存草稿和发布内容。
+
+如果文件名已存在，编辑器会阻止覆盖；需要替换旧文件时，勾选 `Allow overwrite`。
